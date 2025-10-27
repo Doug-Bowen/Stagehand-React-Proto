@@ -1,50 +1,95 @@
-# Stagehand React Proto
+# React Controls Demo
 
-A modern React TypeScript application with automated end-to-end testing using Playwright.
+A comprehensive Material-UI component showcase built with React and TypeScript, designed for automated testing and component exploration.
+
+## 🎯 Purpose
+
+This application serves as a **testing playground** and **component library showcase** featuring 60+ Material-UI components organized in an interactive dashboard. Perfect for:
+
+- **Automated Testing**: Stagehand, Playwright, and other testing frameworks
+- **Component Exploration**: Interactive examples of MUI components
+- **Visual Regression Testing**: Comprehensive UI component coverage
+- **Accessibility Testing**: Properly labeled and structured components
+- **Development Reference**: Real-world component implementations
 
 ## 🚀 Tech Stack
 
 ### Frontend Application
 - **React 18.2** - Modern React with concurrent features
 - **TypeScript 4.9** - Type-safe JavaScript
-- **MUI v5** (Material-UI) - Modern React component library
-- **Emotion** - CSS-in-JS styling solution
-- **SCSS** - Enhanced CSS with variables and mixins
-- **React Context** - State management
-- **React Hook Form** - Performant form handling
-- **React Router v5** - Client-side routing
-- **Azure MSAL** - Microsoft authentication library
+- **MUI v5.18** (Material-UI) - Comprehensive React component library
+- **MUI Icons v5.18** - Material Design icon library
+- **Emotion 11.14** - CSS-in-JS styling solution for custom components
+- **React Router v5.2** - Client-side routing
 
 ### Development & Testing
-- **React Scripts 5.0** - Modern build tooling with Webpack 5
-- **Playwright** - Reliable end-to-end testing framework
-- **TypeScript** - Full type checking and IntelliSense
-- **ESLint** - Code quality and consistency
-- **Jest** - Unit testing framework
+- **React Scripts 5.0** - Modern build tooling with Webpack 5 and hot reloading
+- **Playwright 1.15** - Cross-browser end-to-end testing framework
+- **TypeScript** - Static type checking and enhanced IntelliSense
+- **ESLint** - Code quality and consistency enforcement
+- **Jest & React Testing Library** - Unit and integration testing
+
+## 🎨 Featured Components
+
+The dashboard showcases components organized in 4 interactive tabs:
+
+### **Tab 1: Form Controls**
+- **Input Components**: TextField (text, email, multiline), Autocomplete
+- **Selection Controls**: Select, Radio Groups, Checkboxes, Switches  
+- **Interactive Elements**: Sliders, Ratings, Toggle Button Groups
+- **Button Variations**: Primary, Secondary, Success, Warning, Error
+- **Icon Buttons**: Edit, Delete, Share with tooltips
+
+### **Tab 2: Data Display**
+- **Data Tables**: Complete tables with sorting, avatars, and actions
+- **Progress Indicators**: Linear & Circular progress, loading states
+- **Visual Elements**: Chips, Badges, Avatars in various styles
+- **Loading States**: Skeleton components for content loading
+
+### **Tab 3: Navigation**
+- **Lists**: Interactive list items with icons and descriptions
+- **Steppers**: Multi-step workflow visualization
+- **Accordions**: Expandable content sections
+- **Breadcrumbs**: Hierarchical navigation
+
+### **Tab 4: Feedback**
+- **Alerts**: Success, Info, Warning, Error message types
+- **Dialogs**: Modal dialogs with form interactions
+- **Snackbars**: Toast-style notifications
+
+### **Additional Features**
+- **Floating Action Buttons**: Fixed position primary actions
+- **Speed Dial**: Multi-action floating menus
+- **Stats Cards**: Dashboard metrics with icons
+- **Interactive Forms**: Complete form workflows
 
 ## 📁 Project Structure
 
 ```
 src/
-├── components/          # Reusable UI components
-├── containers/          # Page-level components
-├── contexts/           # React Context providers
-├── hooks/              # Custom React hooks
-├── styles/             # Global styles and themes
-└── Routes.tsx          # Application routing
+├── components/
+│   └── ErrorBoundary/      # Error handling component
+├── containers/
+│   └── Dashboard/          # Main MUI components showcase
+├── contexts/
+│   └── Authentication/     # Simplified auth context
+├── styles/                 # Global styles and themes
+├── App.tsx                 # Main application component
+├── Routes.tsx              # Application routing
+└── index.tsx               # Application entry point
 
 E2E/
-├── fixtures/           # Test data factories and mocks
-├── PageObjects/        # Page Object Model pattern
-├── Tests/              # Playwright test suites
-└── Utils/              # Testing utilities
+├── fixtures/               # Test data factories and mocks
+├── PageObjects/           # Page Object Model pattern
+├── Tests/                 # Playwright test suites
+└── Utils/                 # Testing utilities
 ```
 
 ## 🛠 Getting Started
 
 ### Prerequisites
 - Node.js 16+ 
-- npm or yarn
+- npm
 
 ### Installation & Development
 
@@ -76,38 +121,46 @@ npx playwright test
 npm test
 ```
 
+## 🧪 Testing Features
+
+This demo is optimized for automated testing with:
+
+- **Semantic HTML**: Proper labels, ARIA attributes, and accessible markup
+- **Consistent Selectors**: Predictable element identification
+- **Interactive Elements**: All components support user interactions
+- **Loading States**: Dynamic content and async operations
+- **Form Validation**: Real form behaviors for testing
+- **Navigation Patterns**: Single-page app routing
+- **Responsive Design**: Mobile and desktop layouts
+
 ## 🏗 Architecture
 
 ### Component Design
-- **Emotion Styled Components** for component-scoped styling
-- **MUI v5** for consistent design system
-- **TypeScript interfaces** for prop validation
+- **MUI v5** components with consistent theming
+- **TypeScript interfaces** for comprehensive prop validation
 - **React 18** patterns with proper children typing
-
-### Testing Strategy
-- **Page Object Model** - Maintainable test organization
-- **Factory Pattern** - Dynamic test data generation
-- **Playwright** - Cross-browser testing capabilities
-
-## 🔧 Recent Updates
-
-This project has been updated to use modern React and build tools:
-- Upgraded from React 17 → React 18
-- Updated Material-UI v4 → MUI v5  
-- Enhanced TypeScript configuration
-- Resolved Babel dependency conflicts
-- Improved component prop typing for React 18
+- **Emotion styled components** for custom styling
+- **Simplified routing** focused on component showcase
 
 ## 📜 Available Scripts
 
 - `npm start` - Development server
 - `npm run build` - Production build
 - `npm test` - Run Jest unit tests
-- `npm run eject` - Eject from Create React App (one-way operation)
+- `npx playwright test` - Run E2E tests
 
 ## 🌐 Browser Support
 
-- Chrome (last version)
-- Firefox (last version) 
-- Safari (last version)
-- Production builds support >0.2% usage, excluding dead browsers
+- Chrome (latest)
+- Firefox (latest) 
+- Safari (latest)
+- Edge (latest)
+
+## 🎯 Use Cases
+
+- **Stagehand Testing**: Comprehensive component interactions
+- **Playwright Automation**: Cross-browser testing scenarios
+- **Visual Testing**: Screenshot and visual regression testing
+- **Accessibility Audits**: WCAG compliance testing
+- **Component Documentation**: Live examples of MUI components
+- **Development Reference**: Implementation patterns and best practices
