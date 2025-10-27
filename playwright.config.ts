@@ -3,8 +3,7 @@ import { PlaywrightTestConfig } from '@playwright/test';
 // Consumes environment variables for tests to utilize
 import dotenv from 'dotenv';
 import path from 'path';
-dotenv.config({ path: path.resolve(__dirname, './', '.env') });
-dotenv.config({ path: path.resolve(__dirname, './', '.env.development') });
+dotenv.config({ path: path.resolve(__dirname, './', '.env'), quiet: true });
 
 const config: PlaywrightTestConfig = {
     testDir: 'E2E/Tests/',
