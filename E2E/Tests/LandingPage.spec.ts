@@ -2,13 +2,13 @@
 import { test, expect } from '../Utils/StagehandFixture';
 import { LandingPage } from '../PageObjects/LandingPage.PageObject';
 import { z } from 'zod/v3';
-
-const landingPage = new LandingPage();
+import { UrlsUtil } from '../Utils/Urls.Util';
+const urls = new UrlsUtil
 
 test(`Verify File Count`, async ({ stagehandPage }) => { 
     // Arrange
     const expectedTotalFiles = 86;
-    await landingPage.navigate(stagehandPage);
+    await stagehandPage.goto(urls.landingPage);
     
     // Act
     await stagehandPage.act("click all of the tabs on the page");
@@ -28,7 +28,7 @@ test(`Verify File Count`, async ({ stagehandPage }) => {
 test(`Verify First Name`, async ({ stagehandPage }) => { 
     // Arrange
     const expectedFirstName = "John";
-    await landingPage.navigate(stagehandPage);
+     await stagehandPage.goto(urls.landingPage);
     
     // Act
     await stagehandPage.act("Click the Data Display tab");
