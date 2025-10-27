@@ -1,27 +1,26 @@
 // @ts-nocheck
-import { test, expect } from '@playwright/test';
-import { Stagehand } from '@browserbasehq/stagehand';
+import { test, expect } from '../Utils/StagehandFixture';
 import { LandingPage } from '../PageObjects/LandingPage.PageObject';
+import { z } from 'zod/v3';
 
 const landingPage = new LandingPage();
 
-test(`Verify Widgets`, async ({ page }) => {
+test(`Verify Widgets with Fixture`, async ({ stagehandPage }) => { 
     // Arrange
-    const stagehand = new Stagehand({ 
-        env: "LOCAL", 
-        verbose: 1, 
-        debugDom: true, 
-        enableCaching: false 
-    });
-    await stagehand.init();
-    const stagehandPage = stagehand.page; // Get the enhanced page from Stagehand
     const expectedTotalFiles = 86;
     
-    // Act
-    await landingPage.navigate(stagehandPage); // Use stagehand page instead of playwright page
-    await stagehandPage.act("click all of the tabs on the page"); // Use stagehand page
-
+    // Act - Use the enhanced page from the fixture
+    await landingPage.navigate(stagehandPage);
+    await stagehandPage.act("click all of the tabs on the page");
+    
     // Assert
-   
+    const widgetData = await stagehandPage.extract({
+        instruction: "extract the total number of widgets",
+        schema: z.object({
+            totalWidgets: z.number()
+        })
+    });
+    
+    console.log("Extracted data:", widgetData);
 });
 
