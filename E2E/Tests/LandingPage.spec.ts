@@ -5,22 +5,43 @@ import { z } from 'zod/v3';
 
 const landingPage = new LandingPage();
 
-test(`Verify Widgets with Fixture`, async ({ stagehandPage }) => { 
+test(`Verify File Count`, async ({ stagehandPage }) => { 
     // Arrange
     const expectedTotalFiles = 86;
-    
-    // Act - Use the enhanced page from the fixture
     await landingPage.navigate(stagehandPage);
+    
+    // Act
     await stagehandPage.act("click all of the tabs on the page");
     
     // Assert
-    const widgetData = await stagehandPage.extract({
-        instruction: "extract the total number of widgets",
+    const fileData = await stagehandPage.extract({
+        instruction: "extract the total number of files",
         schema: z.object({
-            totalWidgets: z.number()
+            totalFiles: z.number()
         })
     });
     
-    console.log("Extracted data:", widgetData);
+    console.log("Extracted data:", fileData);
+    expect(fileData.totalFiles).toBe(expectedTotalFiles);
+});
+
+test(`Verify First Name`, async ({ stagehandPage }) => { 
+    // Arrange
+    const expectedFirstName = "John";
+    await landingPage.navigate(stagehandPage);
+    
+    // Act
+    await stagehandPage.act("Click the Data Display tab");
+    
+    // Assert
+    const nameData = await stagehandPage.extract({
+        instruction: "extract the first name from the table",
+        schema: z.object({
+            firstName: z.string()
+        })
+    });
+
+    console.log("Extracted data:", nameData);
+    expect(nameData.firstName).toBe(expectedFirstName);
 });
 
