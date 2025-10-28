@@ -20,7 +20,6 @@ test(`Verify File Count`, async ({ page }) => {
     });
     
     // Assert
-    console.log("Extracted data:", fileData);
     expect(fileData.totalFiles).toBe(expectedTotalFiles);
 });
 
@@ -39,7 +38,6 @@ test(`Verify First Name`, async ({ page }) => {
     });
     
     // Assert
-    console.log("Extracted data:", nameData);
     expect(nameData.firstName).toBe(expectedFirstName);
 });
 
@@ -59,6 +57,5 @@ test(`Solve a Captcha`, async ({ page }) => {
     });
     
     // Assert
-    console.log("Extracted data:", toastData);
     expect(toastData.toastMessage).toBe(expectedToastValue);
 });

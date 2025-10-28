@@ -6,8 +6,10 @@ export const test = base.extend<{ page: any }>({
   page: async ({ }, use) => { 
     const stagehand = new Stagehand({
       env: "LOCAL",
-      verbose: 1,
-      enableCaching: false
+      verbose: 0, // 0 = minimal logging, 1 = medium, 2 = detailed
+      enableCaching: false,
+      disablePino: true, // Disable Pino logger for cleaner output
+      logger: () => {}, // Override logger to suppress all logs
     });
     
     await stagehand.init();
