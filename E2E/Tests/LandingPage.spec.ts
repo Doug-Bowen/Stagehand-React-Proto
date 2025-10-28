@@ -12,8 +12,6 @@ test(`Verify File Count`, async ({ page }) => {
     
     // Act
     await page.act("click all of the tabs on the page");
-    
-    // Assert
     const fileData = await page.extract({
         instruction: "extract the total number of files",
         schema: z.object({
@@ -21,6 +19,7 @@ test(`Verify File Count`, async ({ page }) => {
         })
     });
     
+    // Assert
     console.log("Extracted data:", fileData);
     expect(fileData.totalFiles).toBe(expectedTotalFiles);
 });
@@ -32,16 +31,34 @@ test(`Verify First Name`, async ({ page }) => {
     
     // Act
     await page.act("Click the Data Display tab");
-    
-    // Assert
     const nameData = await page.extract({
         instruction: "extract the first name from the table",
         schema: z.object({
             firstName: z.string()
         })
     });
-
+    
+    // Assert
     console.log("Extracted data:", nameData);
     expect(nameData.firstName).toBe(expectedFirstName);
 });
 
+test(`Solve a Captcha`, async ({ page }) => { 
+    // Arrange
+    const expectedToastValue = "Captcha verified successfully! You have proven you're human.";
+    await page.goto(urls.landingPage);
+    
+    // Act
+    await page.act("Click the Captcha tab");
+    await agent.execute("Solve the captcha on the page");
+    const toastData = await page.extract({
+        instruction: "extract the toast message after the captcha is solved",
+        schema: z.object({
+            toastMessage: z.string()
+        })
+    });
+    
+    // Assert
+    console.log("Extracted data:", toastData);
+    expect(toastData.toastMessage).toBe(expectedToastValue);
+});
