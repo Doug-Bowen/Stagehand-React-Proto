@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -90,6 +90,8 @@ import {
   FileCopy,
   Timeline,
   ShoppingCart,
+  Security,
+  Refresh,
 } from '@mui/icons-material';
 
 interface TabPanelProps {
@@ -129,6 +131,11 @@ const DashboardPage: FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [toggleValue, setToggleValue] = useState('left');
   const [loading, setLoading] = useState(false);
+  
+  // Captcha state
+  const [captchaCode, setCaptchaCode] = useState('');
+  const [captchaInput, setCaptchaInput] = useState('');
+  const [captchaResult, setCaptchaResult] = useState<'success' | 'error' | null>(null);
 
   const autocompleteOptions = ['React', 'TypeScript', 'Material-UI', 'JavaScript', 'HTML', 'CSS'];
   
@@ -143,6 +150,36 @@ const DashboardPage: FC = () => {
     setLoading(true);
     setTimeout(() => setLoading(false), 3000);
   };
+
+  // Generate random captcha code
+  const generateCaptcha = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setCaptchaCode(result);
+    setCaptchaInput('');
+    setCaptchaResult(null);
+  };
+
+  // Verify captcha
+  const verifyCaptcha = () => {
+    if (captchaInput.toUpperCase() === captchaCode) {
+      setCaptchaResult('success');
+    } else {
+      setCaptchaResult('error');
+      setTimeout(() => {
+        generateCaptcha();
+        setCaptchaResult(null);
+      }, 2000);
+    }
+  };
+
+  // Initialize captcha on component mount
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
@@ -247,6 +284,7 @@ const DashboardPage: FC = () => {
           <Tab label="Data Display" icon={<Timeline />} />
           <Tab label="Navigation" icon={<Menu />} />
           <Tab label="Feedback" icon={<Notifications />} />
+          <Tab label="Captcha" icon={<Security />} />
         </Tabs>
 
         {/* Tab 1: Form Controls */}
@@ -673,6 +711,188 @@ const DashboardPage: FC = () => {
                   <Button onClick={() => setDialogOpen(true)}>Open Dialog</Button>
                   <Button onClick={() => setSnackbarOpen(true)}>Show Snackbar</Button>
                 </CardActions>
+              </Card>
+            </Grid>
+          </Grid>
+        </TabPanel>
+
+        {/* Tab 5: Captcha */}
+        <TabPanel value={tabValue} index={4}>
+          <Grid container spacing={3} justifyContent="center">
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardHeader 
+                  title="Captcha Verification" 
+                  subheader="Prove you're human by entering the code below"
+                />
+                <CardContent>
+                  <Stack spacing={3} alignItems="center">
+                    {/* Captcha Display */}
+                    <Paper 
+                      elevation={3}
+                      sx={{ 
+                        p: 3, 
+                        backgroundColor: '#f5f5f5',
+                        border: '2px solid #ddd',
+                        textAlign: 'center',
+                        minHeight: 80,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      {/* Background noise lines */}
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          background: `
+                            linear-gradient(45deg, transparent 40%, rgba(0,0,0,0.1) 50%, transparent 60%),
+                            linear-gradient(-45deg, transparent 40%, rgba(0,0,0,0.05) 50%, transparent 60%)
+                          `,
+                          zIndex: 1
+                        }}
+                      />
+                      <Typography 
+                        variant="h3" 
+                        sx={{ 
+                          fontFamily: 'monospace',
+                          letterSpacing: 8,
+                          transform: 'skew(-5deg)',
+                          color: '#333',
+                          textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+                          position: 'relative',
+                          zIndex: 2
+                        }}
+                      >
+                        {captchaCode}
+                      </Typography>
+                    </Paper>
+
+                    {/* Input and Controls */}
+                    <TextField
+                      fullWidth
+                      label="Enter Captcha Code"
+                      value={captchaInput}
+                      onChange={(e) => setCaptchaInput(e.target.value)}
+                      placeholder="Enter the code above"
+                      inputProps={{ style: { textTransform: 'uppercase' } }}
+                      disabled={captchaResult === 'success'}
+                      error={captchaResult === 'error'}
+                      helperText={
+                        captchaResult === 'success' 
+                          ? 'Verification successful!' 
+                          : captchaResult === 'error' 
+                          ? 'Incorrect code. Try again!' 
+                          : 'Enter the code exactly as shown'
+                      }
+                    />
+
+                    <Stack direction="row" spacing={2}>
+                      <Button
+                        variant="contained"
+                        onClick={verifyCaptcha}
+                        disabled={!captchaInput || captchaResult === 'success'}
+                        color={captchaResult === 'success' ? 'success' : 'primary'}
+                      >
+                        {captchaResult === 'success' ? 'Verified ✓' : 'Verify'}
+                      </Button>
+                      
+                      <Button
+                        variant="outlined"
+                        onClick={generateCaptcha}
+                        startIcon={<Refresh />}
+                        disabled={captchaResult === 'success'}
+                      >
+                        New Code
+                      </Button>
+                    </Stack>
+
+                    {/* Success/Error Feedback */}
+                    {captchaResult === 'success' && (
+                      <Alert severity="success" sx={{ width: '100%' }}>
+                        <strong>Captcha verified successfully!</strong> You have proven you're human.
+                      </Alert>
+                    )}
+
+                    {captchaResult === 'error' && (
+                      <Alert severity="error" sx={{ width: '100%' }}>
+                        <strong>Verification failed!</strong> Please try again with the new code.
+                      </Alert>
+                    )}
+
+                    {/* Reset Button */}
+                    {captchaResult === 'success' && (
+                      <Button
+                        variant="text"
+                        onClick={() => {
+                          generateCaptcha();
+                          setCaptchaResult(null);
+                          setCaptchaInput('');
+                        }}
+                      >
+                        Reset Captcha
+                      </Button>
+                    )}
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Info Card */}
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardHeader title="About This Captcha" />
+                <CardContent>
+                  <Stack spacing={2}>
+                    <Typography variant="body1">
+                      This is a makeshift captcha implementation for testing purposes.
+                    </Typography>
+                    
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Features:</strong>
+                    </Typography>
+                    <List dense>
+                      <ListItemText 
+                        primary="• 6-character alphanumeric code"
+                        sx={{ py: 0 }}
+                      />
+                      <ListItemText 
+                        primary="• Visual distortion with skewed text"
+                        sx={{ py: 0 }}
+                      />
+                      <ListItemText 
+                        primary="• Background noise pattern"
+                        sx={{ py: 0 }}
+                      />
+                      <ListItemText 
+                        primary="• Case-insensitive verification"
+                        sx={{ py: 0 }}
+                      />
+                      <ListItemText 
+                        primary="• Automatic refresh on failure"
+                        sx={{ py: 0 }}
+                      />
+                    </List>
+
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Current Status:</strong> {
+                          captchaResult === 'success' 
+                            ? '✅ Verified' 
+                            : captchaResult === 'error'
+                            ? '❌ Failed'
+                            : '⏳ Pending'
+                        }
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </CardContent>
               </Card>
             </Grid>
           </Grid>
