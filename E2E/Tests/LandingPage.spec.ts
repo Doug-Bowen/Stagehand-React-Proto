@@ -48,7 +48,7 @@ test(`Solve a Captcha`, async ({ page }) => {
     
     // Act
     await page.act("Click the Captcha tab");
-    await agent.execute("Solve the captcha on the page");
+    await page.act("Solve the captcha on the page");
     const toastData = await page.extract({
         instruction: "extract the toast message after the captcha is solved",
         schema: z.object({
