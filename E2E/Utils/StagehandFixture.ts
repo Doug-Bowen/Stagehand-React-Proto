@@ -2,8 +2,8 @@
 import { test as base } from '@playwright/test';
 import { Stagehand } from '@browserbasehq/stagehand';
 
-export const test = base.extend<{ stagehandPage: any }>({
-  stagehandPage: async ({ }, use) => { // Remove unused page parameter
+export const test = base.extend<{ page: any }>({
+  page: async ({ }, use) => { 
     const stagehand = new Stagehand({
       env: "LOCAL",
       verbose: 1,

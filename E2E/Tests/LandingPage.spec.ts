@@ -5,16 +5,16 @@ import { z } from 'zod/v3';
 import { UrlsUtil } from '../Utils/Urls.Util';
 const urls = new UrlsUtil
 
-test(`Verify File Count`, async ({ stagehandPage }) => { 
+test(`Verify File Count`, async ({ page }) => { 
     // Arrange
     const expectedTotalFiles = 86;
-    await stagehandPage.goto(urls.landingPage);
+    await page.goto(urls.landingPage);
     
     // Act
-    await stagehandPage.act("click all of the tabs on the page");
+    await page.act("click all of the tabs on the page");
     
     // Assert
-    const fileData = await stagehandPage.extract({
+    const fileData = await page.extract({
         instruction: "extract the total number of files",
         schema: z.object({
             totalFiles: z.number()
@@ -25,16 +25,16 @@ test(`Verify File Count`, async ({ stagehandPage }) => {
     expect(fileData.totalFiles).toBe(expectedTotalFiles);
 });
 
-test(`Verify First Name`, async ({ stagehandPage }) => { 
+test(`Verify First Name`, async ({ page }) => { 
     // Arrange
     const expectedFirstName = "John";
-     await stagehandPage.goto(urls.landingPage);
+     await page.goto(urls.landingPage);
     
     // Act
-    await stagehandPage.act("Click the Data Display tab");
+    await page.act("Click the Data Display tab");
     
     // Assert
-    const nameData = await stagehandPage.extract({
+    const nameData = await page.extract({
         instruction: "extract the first name from the table",
         schema: z.object({
             firstName: z.string()
