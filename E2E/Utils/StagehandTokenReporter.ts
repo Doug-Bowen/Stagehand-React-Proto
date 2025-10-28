@@ -20,34 +20,23 @@ interface TokenMetrics {
   observeCompletionTokens: number;
 }
 
-// Model pricing configuration (per 1K tokens) - Updated October 2025
+// Updated October 2025
 const MODEL_PRICING = {
-  // GPT-5 Family (Projected/Estimated - adjust when official pricing available)
   'gpt-5': { prompt: 0.010, completion: 0.030 },
   'gpt-5-turbo': { prompt: 0.008, completion: 0.024 },
   'gpt-5-mini': { prompt: 0.002, completion: 0.006 },
-  
-  // GPT-4 Family
   'gpt-4o': { prompt: 0.005, completion: 0.015 },
   'gpt-4o-mini': { prompt: 0.00015, completion: 0.0006 },
   'gpt-4-turbo': { prompt: 0.01, completion: 0.03 },
   'gpt-4': { prompt: 0.03, completion: 0.06 },
-  
-  // GPT-3.5 Family
   'gpt-3.5-turbo': { prompt: 0.001, completion: 0.002 },
   'gpt-3.5-turbo-instruct': { prompt: 0.0015, completion: 0.002 },
-  
-  // Claude Family (Anthropic)
   'claude-3.5-sonnet': { prompt: 0.003, completion: 0.015 },
   'claude-3-opus': { prompt: 0.015, completion: 0.075 },
   'claude-3-sonnet': { prompt: 0.003, completion: 0.015 },
   'claude-3-haiku': { prompt: 0.00025, completion: 0.00125 },
-  
-  // Gemini Family (Google)
   'gemini-1.5-pro': { prompt: 0.0035, completion: 0.0105 },
   'gemini-1.5-flash': { prompt: 0.000075, completion: 0.0003 },
-  
-  // Default fallback (GPT-4o pricing)
   'default': { prompt: 0.005, completion: 0.015 }
 } as const;
 
@@ -63,9 +52,7 @@ class StagehandTokenReporter implements Reporter {
 
   private testMetrics: Map<string, TokenMetrics> = new Map();
   
-  // Configure the model used for cost estimation
-  // You can change this to match the model Stagehand is actually using
-  private modelName: keyof typeof MODEL_PRICING = 'gpt-4o'; // Default to GPT-4o
+  private modelName: keyof typeof MODEL_PRICING = 'gpt-4o';
 
   constructor(options?: { model?: keyof typeof MODEL_PRICING }) {
     if (options?.model) {
@@ -95,10 +82,6 @@ class StagehandTokenReporter implements Reporter {
   }
 
   async onEnd(result: FullResult): Promise<void> {
-    console.log('\n' + '='.repeat(80));
-    console.log('🤖 STAGEHAND TOKEN USAGE REPORT');
-    console.log('='.repeat(80));
-
     const totalPromptTokens = this.totalTokens.actPromptTokens + 
                              this.totalTokens.extractPromptTokens + 
                              this.totalTokens.observePromptTokens;
@@ -107,65 +90,13 @@ class StagehandTokenReporter implements Reporter {
                                  this.totalTokens.extractCompletionTokens + 
                                  this.totalTokens.observeCompletionTokens;
 
-    const totalTokens = totalPromptTokens + totalCompletionTokens;
-
-    // Overall Summary
-    console.log('\n📊 OVERALL SUMMARY:');
-    console.log(`Total Tokens Used: ${totalTokens.toLocaleString()}`);
-    console.log(`├── Prompt Tokens: ${totalPromptTokens.toLocaleString()}`);
-    console.log(`└── Completion Tokens: ${totalCompletionTokens.toLocaleString()}`);
-
-    // Breakdown by Action Type
-    console.log('\n🎯 BY ACTION TYPE:');
-    console.log(`ACT Operations:`);
-    console.log(`├── Prompt: ${this.totalTokens.actPromptTokens.toLocaleString()}`);
-    console.log(`└── Completion: ${this.totalTokens.actCompletionTokens.toLocaleString()}`);
-    
-    console.log(`EXTRACT Operations:`);
-    console.log(`├── Prompt: ${this.totalTokens.extractPromptTokens.toLocaleString()}`);
-    console.log(`└── Completion: ${this.totalTokens.extractCompletionTokens.toLocaleString()}`);
-    
-    console.log(`OBSERVE Operations:`);
-    console.log(`├── Prompt: ${this.totalTokens.observePromptTokens.toLocaleString()}`);
-    console.log(`└── Completion: ${this.totalTokens.observeCompletionTokens.toLocaleString()}`);
-
     // Cost Estimation
     const estimatedCost = this.calculateEstimatedCost(totalPromptTokens, totalCompletionTokens);
-    const pricing = MODEL_PRICING[this.modelName] || MODEL_PRICING.default;
-    console.log(`\n💰 ESTIMATED COST: $${estimatedCost.toFixed(4)}`);
-    console.log(`├── Model: ${this.modelName}`);
-    console.log(`├── Prompt Rate: $${pricing.prompt.toFixed(6)}/1K tokens`);
-    console.log(`└── Completion Rate: $${pricing.completion.toFixed(6)}/1K tokens`);
-
-    // Per-Test Breakdown
-    if (this.testMetrics.size > 0) {
-      console.log('\n📝 PER-TEST BREAKDOWN:');
-      this.testMetrics.forEach((metrics, testName) => {
-        const testTotal = (metrics.actPromptTokens + metrics.actCompletionTokens +
-                          metrics.extractPromptTokens + metrics.extractCompletionTokens +
-                          metrics.observePromptTokens + metrics.observeCompletionTokens);
-        console.log(`\n  "${testName}": ${testTotal.toLocaleString()} tokens`);
-        if (metrics.actPromptTokens + metrics.actCompletionTokens > 0) {
-          console.log(`  ├── ACT: ${(metrics.actPromptTokens + metrics.actCompletionTokens).toLocaleString()}`);
-        }
-        if (metrics.extractPromptTokens + metrics.extractCompletionTokens > 0) {
-          console.log(`  ├── EXTRACT: ${(metrics.extractPromptTokens + metrics.extractCompletionTokens).toLocaleString()}`);
-        }
-        if (metrics.observePromptTokens + metrics.observeCompletionTokens > 0) {
-          console.log(`  └── OBSERVE: ${(metrics.observePromptTokens + metrics.observeCompletionTokens).toLocaleString()}`);
-        }
-      });
-    }
-
-    console.log('\n' + '='.repeat(80));
-    console.log('Report generated at:', new Date().toISOString());
-    console.log('='.repeat(80) + '\n');
+    console.log(`💰 ESTIMATED COST: $${estimatedCost.toFixed(4)}`);
   }
 
   private calculateEstimatedCost(promptTokens: number, completionTokens: number): number {
     const pricing = MODEL_PRICING[this.modelName] || MODEL_PRICING.default;
-    
-    // Convert pricing from per 1K tokens to per token, then multiply by token counts
     const promptCost = (promptTokens / 1000) * pricing.prompt;
     const completionCost = (completionTokens / 1000) * pricing.completion;
     
