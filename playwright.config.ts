@@ -12,8 +12,7 @@ const config: PlaywrightTestConfig = {
     retries: 0,
     reporter: [
         ['list'],
-        ['html', { open: 'never' }],
-        ['./E2E/Utils/StagehandTokenReporter.ts']
+        ['html', { open: 'never' }]
     ],
     use: {
         headless: false,
