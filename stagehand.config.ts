@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { test as base } from '@playwright/test';
 import { Stagehand } from '@browserbasehq/stagehand';
 
@@ -10,6 +9,7 @@ export const test = base.extend<{ page: any }>({
       enableCaching: false,
       disablePino: true, // Disable Pino logger for cleaner output
       logger: () => {}, // Override logger to suppress all logs
+      model: "openai/gpt-5",
     });
     
     await stagehand.init();
@@ -19,16 +19,3 @@ export const test = base.extend<{ page: any }>({
 });
 
 export { expect } from '@playwright/test';
-
-export class StagehandUtil {
-    getAgent(system_prompt: string) {
-        return this.stagehand.agent({
-            cua: true,
-            model: {
-                modelName: "openai/computer-use-preview",
-                apiKey: process.env.OPENAI_API_KEY
-            },
-            systemPrompt: system_prompt,
-        });
-    }
-}

@@ -1,5 +1,3 @@
-// @ts-nocheck
-import { test, expect } from '../Utils/StagehandFixture';
 import { z } from 'zod/v3';
 import { UrlsUtil } from '../Utils/urls.util';
 import { StagehandUtil } from '../Utils/stagehand.util';
