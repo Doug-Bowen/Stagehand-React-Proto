@@ -32,7 +32,7 @@ export class StagehandUtil {
                 disablePino: true,                     // Disable Pino logger for cleaner output
                 logger: () => {},                      // Override logger to suppress all logs
                 apiKey: process.env.OPENAI_API_KEY,    // Use API key from environment variables
-                modelName: "openai/gpt-5",             // Specify the model to use
+                modelName: "openai/gpt-4o",            // Specify the model to use when interpereting commands and actions
             });
             
             await this.stagehand.init();

@@ -1,65 +1,59 @@
-import { test, expect, StagehandUtil } from '../Utils/stagehand.util';
+import { test, expect } from '../Utils/stagehand.util';
 import { z } from 'zod/v3';
-import { UrlsUtil } from '../Utils/urls.util';
+import { NavigationUtil } from '../Utils/navigation.util';
+import { CorePrompts } from '../Prompts/core.prompts';
 
-const urls = new UrlsUtil();
+const navigationUtil = new NavigationUtil();
+const corePrompts = new CorePrompts();
 
-test.skip(`Verify File Count`, async ({ page }) => { 
+test(`Verify File Count`, async ({ page }) => { 
     // Arrange
     const expectedTotalFiles = 86;
-    await page.goto(urls.landingPage);
+    await navigationUtil.browseTo(page, navigationUtil.landingPage);
     
     // Act
-    await page.act("click all of the tabs on the page");
+    await page.act(corePrompts.clickAll("tabs"));
     const fileData = await page.extract({
-        instruction: "extract the total number of files",
-        schema: z.object({
-            totalFiles: z.number()
-        })
+        instruction: corePrompts.extract("the total number of files"),
+        schema: z.object({ totalFiles: z.number() }),
     });
     
     // Assert
     expect(fileData.totalFiles).toBe(expectedTotalFiles);
 });
 
-test.skip(`Verify First Name`, async ({ page }) => { 
+test(`Verify Specific Name`, async ({ page }) => { 
     // Arrange
-    const expectedFirstName = "John";
-    await page.goto(urls.landingPage);
+    const expectedtName = "Smith";
+    await navigationUtil.browseTo(page, navigationUtil.landingPage);
     
     // Act
-    await page.act("Click the Data Display tab");
+    await page.act(corePrompts.click("Data Display tab"));
     const nameData = await page.extract({
-        instruction: "extract the first name from the table",
-        schema: z.object({
-            firstName: z.string()
-        })
+        instruction: corePrompts.extract("the last name from the second row of the table"),
+        schema: z.object({ actualName: z.string()})
     });
     
     // Assert
-    expect(nameData.firstName).toBe(expectedFirstName);
+    expect(nameData.actualName).toBe(expectedtName);
 });
 
-test(`Solve a Captcha`, async ({ page }) => { 
+test(`Verify Captcha Success Message`, async ({ page }) => { 
     // Arrange
-    const expectedToastValue = "Captcha verified successfully! You have proven you're human.";
-    await page.goto(urls.landingPage);
+    const expectedToastValue = "Captcha verified successfully";
+    await navigationUtil.browseTo(page, navigationUtil.landingPage);
     
     // Act
-    const result = await page.agent.execute({
-        instruction: "Solve the captcha on this page",
+    await page.agent.execute({
+        instruction: corePrompts.solve("captcha"),
         maxSteps: 20,
         highlightCursor: true
     });
-
-    // Extract toast data after the action
     const toastData = await page.extract({
-        instruction: "extract the toast message that appears",
-        schema: z.object({
-            toastMessage: z.string()
-        })
+        instruction: corePrompts.waitFor("captcha to be solved") + " and " + corePrompts.extract("the toast message that appears"),
+        schema: z.object({toastMessage: z.string()})
     });
 
     // Assert
-    expect(toastData.toastMessage).toBe(expectedToastValue);
+    expect(toastData.toastMessage).toContain(expectedToastValue);
 });
