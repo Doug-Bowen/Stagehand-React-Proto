@@ -74,3 +74,20 @@ test(`Verify Captcha Success Message`, async ({ page }) => {
     // Assert
     expect(toastData.toastMessage).toContain(expectedToastValue);
 });
+
+test(`Verify Captcha Success Message 2`, async ({ page }) => { 
+    // Arrange
+    const expectedToastValue = "Captcha verified successfully";
+    await navigationUtil.browseTo(page, navigationUtil.landingPage);
+    
+    // Act
+    await page.act(corePrompts.click("Captcha tab"));
+    await page.act(corePrompts.observe("Captcha widget"));
+    await page.act(corePrompts.observe("Captcha value"));
+    await page.act(corePrompts.fill("captcha", "captcha value"));
+    await page.act(corePrompts.click("Verify Captcha button"));
+    const toastMessage = await page.act(corePrompts.extract("the toast message that appears"));
+
+    // Assert
+    expect(toastMessage.message).toContain(expectedToastValue);
+});
