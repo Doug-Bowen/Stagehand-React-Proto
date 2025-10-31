@@ -1,5 +1,6 @@
 import { test as base } from '@playwright/test';
 import { Stagehand } from '@browserbasehq/stagehand';
+export { expect } from '@playwright/test';
 
 export const test = base.extend<{ page: any }>({
   page: async ({ }, use, testInfo) => { 
@@ -17,5 +18,3 @@ export const test = base.extend<{ page: any }>({
     await stagehand.close();
   },
 });
-
-export { expect } from '@playwright/test';

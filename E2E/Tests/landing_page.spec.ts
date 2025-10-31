@@ -1,8 +1,7 @@
+import { test, expect, StagehandUtil } from '../Utils/stagehand.util';
 import { z } from 'zod/v3';
 import { UrlsUtil } from '../Utils/urls.util';
-import { StagehandUtil } from '../Utils/stagehand.util';
 
-const stagehandUtil = new StagehandUtil(stagehand);
 const urls = new UrlsUtil();
 
 test.skip(`Verify File Count`, async ({ page }) => { 
@@ -26,7 +25,7 @@ test.skip(`Verify File Count`, async ({ page }) => {
 test.skip(`Verify First Name`, async ({ page }) => { 
     // Arrange
     const expectedFirstName = "John";
-     await page.goto(urls.landingPage);
+    await page.goto(urls.landingPage);
     
     // Act
     await page.act("Click the Data Display tab");
@@ -43,16 +42,23 @@ test.skip(`Verify First Name`, async ({ page }) => {
 
 test(`Solve a Captcha`, async ({ page }) => { 
     // Arrange
-    const agent = stagehandUtil.getAgent();
     const expectedToastValue = "Captcha verified successfully! You have proven you're human.";
     await page.goto(urls.landingPage);
     
     // Act
-    await agent.execute({
-        instruction: "Go to Hacker News and find the most controversial post from today, then read the top 3 comments and summarize the debate.",
+    const result = await page.agent.execute({
+        instruction: "Solve the captcha on this page",
         maxSteps: 20,
         highlightCursor: true
-});
+    });
+
+    // Extract toast data after the action
+    const toastData = await page.extract({
+        instruction: "extract the toast message that appears",
+        schema: z.object({
+            toastMessage: z.string()
+        })
+    });
 
     // Assert
     expect(toastData.toastMessage).toBe(expectedToastValue);
