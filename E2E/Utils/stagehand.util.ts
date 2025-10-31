@@ -2,10 +2,10 @@ import { test as base } from '@playwright/test';
 import { Stagehand } from '@browserbasehq/stagehand';
 export { expect } from '@playwright/test';
 
-// Override the Playwright Page test fixture to provide enhanced page with agent
-// This custom implementation isn't exactly necessary, but it provides a nice way to access both page and agent
-// It creates a hybrid object that has all page methods plus agent
-// Normally Stagehand exposes page and agent via methods, but this way you can access them directly as properties
+// Purpose: To provide tests easy access to both Stagehand page and agent via the Playwright test fixture
+// Reasoning: This allows tests to use both page interactions and agent capabilities seamlessly
+// Notes: This custom implementation isn't exactly necessary, but it makes your tests read exactly like Playwright tests
+// Method: It creates a hybrid object that has all page methods plus agent.Normally Stagehand exposes page and agent via methods, but this way you can access them directly as properties of your page object
 export const test = base.extend<{ page: any }>({
     page: async ({ }, use) => {
         const stagehandUtil = new StagehandUtil();
