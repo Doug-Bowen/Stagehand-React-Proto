@@ -6,6 +6,23 @@ import { CorePrompts } from '../Prompts/core.prompts';
 const navigationUtil = new NavigationUtil();
 const corePrompts = new CorePrompts();
 
+test(`Fill the Input Controls Form`, async ({ page }) => { 
+    // Arrange
+    await navigationUtil.browseTo(page, navigationUtil.landingPage);
+    var formData = {
+        "Text Input": "Alice",
+        "Multiline": "Johnson\nDiego\nCharster",
+        "Email": "alice.johnson@example.com",
+        "Technologies": "Material-UI",
+    };
+
+    // Act
+    await page.act(corePrompts.fillForm("Input Controls Form", formData));
+
+    // Assert
+    await page.screenshot({ path: 'E2E/Screenshots/InputControlsFormFilled.png' });
+});
+
 test(`Verify File Count`, async ({ page }) => { 
     // Arrange
     const expectedTotalFiles = 86;
