@@ -13,20 +13,22 @@ export const test = base.extend<{ page: any }>({
     });
     
     await stagehand.init();
-    
     await use(stagehand.page);
-    
-    // Capture metrics after test completion
-    const metrics = stagehand.stagehandMetrics || {};
-    
-    // Attach metrics to test result for reporter
-    testInfo.attach('stagehand-metrics', {
-      body: JSON.stringify(metrics),
-      contentType: 'application/json'
-    });
-    
     await stagehand.close();
   },
 });
 
 export { expect } from '@playwright/test';
+
+export class StagehandUtil {
+    getAgent(system_prompt: string) {
+        return this.stagehand.agent({
+            cua: true,
+            model: {
+                modelName: "openai/computer-use-preview",
+                apiKey: process.env.OPENAI_API_KEY
+            },
+            systemPrompt: system_prompt,
+        });
+    }
+}

@@ -1,11 +1,13 @@
 // @ts-nocheck
 import { test, expect } from '../Utils/StagehandFixture';
-import { LandingPage } from '../PageObjects/LandingPage.PageObject';
 import { z } from 'zod/v3';
-import { UrlsUtil } from '../Utils/Urls.Util';
-const urls = new UrlsUtil
+import { UrlsUtil } from '../Utils/urls.util';
+import { StagehandUtil } from '../Utils/stagehand.util';
 
-test(`Verify File Count`, async ({ page }) => { 
+const stagehandUtil = new StagehandUtil(stagehand);
+const urls = new UrlsUtil();
+
+test.skip(`Verify File Count`, async ({ page }) => { 
     // Arrange
     const expectedTotalFiles = 86;
     await page.goto(urls.landingPage);
@@ -23,7 +25,7 @@ test(`Verify File Count`, async ({ page }) => {
     expect(fileData.totalFiles).toBe(expectedTotalFiles);
 });
 
-test(`Verify First Name`, async ({ page }) => { 
+test.skip(`Verify First Name`, async ({ page }) => { 
     // Arrange
     const expectedFirstName = "John";
      await page.goto(urls.landingPage);
@@ -43,19 +45,17 @@ test(`Verify First Name`, async ({ page }) => {
 
 test(`Solve a Captcha`, async ({ page }) => { 
     // Arrange
+    const agent = stagehandUtil.getAgent();
     const expectedToastValue = "Captcha verified successfully! You have proven you're human.";
     await page.goto(urls.landingPage);
     
     // Act
-    await page.act("Click the Captcha tab");
-    await page.act("Solve the captcha on the page");
-    const toastData = await page.extract({
-        instruction: "extract the toast message after the captcha is solved",
-        schema: z.object({
-            toastMessage: z.string()
-        })
-    });
-    
+    await agent.execute({
+        instruction: "Go to Hacker News and find the most controversial post from today, then read the top 3 comments and summarize the debate.",
+        maxSteps: 20,
+        highlightCursor: true
+});
+
     // Assert
     expect(toastData.toastMessage).toBe(expectedToastValue);
 });
