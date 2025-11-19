@@ -70,23 +70,3 @@ test(`Verify Specific Name`, async ({ page }) => {
     // Assert
     expect(nameData.actualName).toBe(expectedtName);
 });
-
-test.skip(`Verify Captcha Success Message`, async ({ page }) => { 
-    // Arrange
-    const expectedToastValue = "Captcha verified successfully";
-    await navigationUtil.browseTo(page, navigationUtil.landingPage);
-    
-    // Act
-    await page.agent.execute({
-        instruction: prompts.solve("captcha"),
-        maxSteps: 20,
-        highlightCursor: true
-    });
-    const toastData = await page.extract(
-        prompts.waitFor("captcha to be solved") + " and " + prompts.extract("the toast message that appears"),
-        z.object({toastMessage: z.string()})
-    );
-
-    // Assert
-    expect(toastData.toastMessage).toContain(expectedToastValue);
-});
