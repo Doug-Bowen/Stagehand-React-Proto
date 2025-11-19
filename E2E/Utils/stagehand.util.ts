@@ -11,15 +11,26 @@ export const test = base.extend<{ page: any }>({
     const stagehand = new Stagehand({
       env: "LOCAL",
       verbose: 0, // 0 = minimal logging, 1 = medium, 2 = detailed
-      enableCaching: false,
-      disablePino: true, // Disable Pino logger for cleaner output
-      logger: () => {}, // Override logger to suppress all logs
     });
     
     await stagehand.init();
     
-    // Create enhanced page with agent access
-    const enhancedPage = Object.create(stagehand.page);
+    // Get the page from the new context API
+    const page = stagehand.context.pages()[0];
+    
+    // Create enhanced page with Stagehand methods
+    const enhancedPage = Object.create(page);
+    enhancedPage.act = (instruction: string, options?: any) => stagehand.act(instruction, { ...options, page });
+    enhancedPage.extract = (instructionOrOptions: any, schema?: any, options?: any) => {
+      if (typeof instructionOrOptions === 'object' && instructionOrOptions.instruction) {
+        // Handle old API format: { instruction, schema }
+        return stagehand.extract(instructionOrOptions.instruction, instructionOrOptions.schema, { page });
+      } else {
+        // Handle new API format: (instruction, schema, options)
+        return stagehand.extract(instructionOrOptions, schema, { ...options, page });
+      }
+    };
+    enhancedPage.observe = (instruction: string, options?: any) => stagehand.observe(instruction, { ...options, page });
     enhancedPage.agent = stagehand.agent;
     
     await use(enhancedPage);
@@ -37,17 +48,14 @@ export class StagehandUtil {
         if (!this.initialized) {
             this.stagehand = new Stagehand({
                 env: "LOCAL",
-                verbose: 0,                            // 0 = minimal logging, 1 = medium, 2 = detailed
-                enableCaching: false,                  // Disable caching for fresh data each run
-                disablePino: true,                     // Disable Pino logger for cleaner output
-                logger: () => {},                      // Override logger to suppress all logs
+                verbose: 0, // 0 = minimal logging, 1 = medium, 2 = detailed
             });
             
             await this.stagehand.init();
             this.initialized = true;
             
-            // Set up page and agent as direct properties
-            this.page = this.stagehand.page;
+            // Set up page and agent using new 3.x API
+            this.page = this.stagehand.context.pages()[0];
             this.agent = this.stagehand.agent;
         }
         return this.stagehand!;

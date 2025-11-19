@@ -18,8 +18,13 @@ test(`Fill the Input Controls Form`, async ({ page }) => {
         "Technologies": "Material-UI",
     };
     
-    // Act
-    await page.act(prompts.fillForm("Input Controls Form", formData));
+    // Act - Fill each field individually to ensure all fields are populated
+    await page.act(prompts.fill("First Name field", formData["First Name"]));
+    await page.act(prompts.fill("Last Name field", formData["Last Name"]));
+    await page.act(prompts.fill("Reference Number field", formData["Reference Number"]));
+    await page.act(prompts.fill("Comments field", formData["Comments"]));
+    await page.act(prompts.fill("Technologies field", formData["Technologies"]));
+    
     const actualFirstName = prompts.extract_text(page, "First Name");
     const actualLastName = prompts.extract_text(page, "Last Name");
     const actualReferenceNumber = prompts.extract_text(page, "Reference Number");
@@ -41,10 +46,10 @@ test(`Verify File Count`, async ({ page }) => {
     
     // Act
     await page.act(prompts.clickAll("tabs"));
-    const fileData = await page.extract({
-        instruction: prompts.extract("the total number of files"),
-        schema: z.object({ totalFiles: z.number() }),
-    });
+    const fileData = await page.extract(
+        prompts.extract("the total number of files"),
+        z.object({ totalFiles: z.number() })
+    );
     
     // Assert
     expect(fileData.totalFiles).toBe(expectedTotalFiles);
@@ -57,10 +62,10 @@ test(`Verify Specific Name`, async ({ page }) => {
     
     // Act
     await page.act(prompts.click("Data Display tab"));
-    const nameData = await page.extract({
-        instruction: prompts.extract("the last name from the second row of the table"),
-        schema: z.object({ actualName: z.string()})
-    });
+    const nameData = await page.extract(
+        prompts.extract("the last name from the second row of the table"),
+        z.object({ actualName: z.string()})
+    );
     
     // Assert
     expect(nameData.actualName).toBe(expectedtName);
@@ -77,10 +82,10 @@ test.skip(`Verify Captcha Success Message`, async ({ page }) => {
         maxSteps: 20,
         highlightCursor: true
     });
-    const toastData = await page.extract({
-        instruction: prompts.waitFor("captcha to be solved") + " and " + prompts.extract("the toast message that appears"),
-        schema: z.object({toastMessage: z.string()})
-    });
+    const toastData = await page.extract(
+        prompts.waitFor("captcha to be solved") + " and " + prompts.extract("the toast message that appears"),
+        z.object({toastMessage: z.string()})
+    );
 
     // Assert
     expect(toastData.toastMessage).toContain(expectedToastValue);

@@ -25,19 +25,7 @@ const config: PlaywrightTestConfig = {
         {
             name: 'Chrome',
             use: { browserName: 'chromium', channel: 'chromium' }
-        }//,
-        // {
-        //     name: 'Edge',
-        //     use: { browserName: 'chromium', channel: 'msedge' }
-        // },
-        // {
-        //     name: 'Safari',
-        //     use: { browserName: 'webkit' }
-        // },
-        // {
-        //     name: 'Firefox',
-        //     use: { browserName: 'firefox' }
-        // }
+        }
     ]
 };
 export default config;
