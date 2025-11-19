@@ -1,6 +1,10 @@
 import { test as base } from '@playwright/test';
-import { Stagehand } from '@browserbasehq/stagehand';
+import { Stagehand, type AvailableModel } from '@browserbasehq/stagehand';
 export { expect } from '@playwright/test';
+
+const STAGEHAND_MODEL: AvailableModel = "gpt-4o";  
+const STAGEHAND_VERBOSE: 0 | 1 | 2 = 0; // 0=minimal, 1=medium, 2=detailed
+const STAGEHAND_ENV: "LOCAL" | "BROWSERBASE" = "LOCAL";
 
 // Purpose: To provide tests easy access to both Stagehand page and agent via the Playwright test fixture
 // Reasoning: This allows tests to use both page interactions and agent capabilities seamlessly
@@ -9,8 +13,10 @@ export { expect } from '@playwright/test';
 export const test = base.extend<{ page: any }>({
   page: async ({ }, use, testInfo) => { 
     const stagehand = new Stagehand({
-      env: "LOCAL",
-      verbose: 0, // 0 = minimal logging, 1 = medium, 2 = detailed
+      env: STAGEHAND_ENV,
+      model: STAGEHAND_MODEL,
+      verbose: STAGEHAND_VERBOSE,
+      logger: quietLogger,
     });
     
     await stagehand.init();
@@ -47,8 +53,10 @@ export class StagehandUtil {
     async ensureInitialized(): Promise<Stagehand> {
         if (!this.initialized) {
             this.stagehand = new Stagehand({
-                env: "LOCAL",
-                verbose: 0, // 0 = minimal logging, 1 = medium, 2 = detailed
+                env: STAGEHAND_ENV,
+                model: STAGEHAND_MODEL,
+                verbose: STAGEHAND_VERBOSE,
+                logger: quietLogger,
             });
             
             await this.stagehand.init();
@@ -69,3 +77,13 @@ export class StagehandUtil {
         }
     }
 }
+
+// Custom logger to filter out provider environment variable warnings
+const quietLogger = (logLine: any) => {
+  if (logLine.message && logLine.message.includes("No known environment variable for provider")) {
+    return; 
+  }
+  if (logLine.level === 0) {
+    console.log(`[${logLine.category || 'LOG'}] ${logLine.message}`);
+  }
+};
