@@ -13,7 +13,7 @@ test(`Fill the Input Controls Form`, async ({ page }) => {
         "Last Name": "Johnson",
         "Reference Number": "12345",
         "Comments": "This is a test comment\nSecond line\nThird line",
-        "Technologies": "Material-UI",
+        "Technologies": "React",
     };
     await navigationUtil.browseTo(page, navigationUtil.landingPage);
     await page.observe(prompts.observe("Input Controls Form"));
