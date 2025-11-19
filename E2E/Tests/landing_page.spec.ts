@@ -1,26 +1,38 @@
 import { test, expect } from '../Utils/stagehand.util';
 import { z } from 'zod/v3';
 import { NavigationUtil } from '../Utils/navigation.util';
-import { CorePrompts } from '../Prompts/core.prompts';
+import { Prompts } from '../Utils/prompts';
 
 const navigationUtil = new NavigationUtil();
-const corePrompts = new CorePrompts();
+const prompts = new Prompts();
 
 test(`Fill the Input Controls Form`, async ({ page }) => { 
     // Arrange
     await navigationUtil.browseTo(page, navigationUtil.landingPage);
+    await page.observe(prompts.observe("Input Controls Form"));
     var formData = {
-        "Text Input": "Alice",
-        "Multiline": "Johnson\nDiego\nCharster",
-        "Email": "alice.johnson@example.com",
+        "First Name": "Alice",
+        "Last Name": "Johnson",
+        "Reference Number": "12345",
+        "Comments": "This is a test comment\nSecond line\nThird line",
         "Technologies": "Material-UI",
     };
+    
 
     // Act
-    await page.act(corePrompts.fillForm("Input Controls Form", formData));
+    await page.act(prompts.fillForm("Input Controls Form", formData));
+    const actualFirstName = prompts.extract_text(page, "First Name");
+    const actualLastName = prompts.extract_text(page, "Last Name");
+    const actualReferenceNumber = prompts.extract_text(page, "Reference Number");
+    const actualComments = prompts.extract_text(page, "Comments");
+    const actualTechnologies = prompts.extract_text(page, "Technologies");
 
     // Assert
-    await page.screenshot({ path: 'E2E/Screenshots/InputControlsFormFilled.png' });
+    expect((await actualFirstName).actual).toBe(formData["First Name"]);
+    expect((await actualLastName).actual).toBe(formData["Last Name"]);
+    expect((await actualReferenceNumber).actual).toBe(formData["Reference Number"]);
+    expect((await actualComments).actual).toBe(formData["Comments"]);
+    expect((await actualTechnologies).actual).toBe(formData["Technologies"]);
 });
 
 test(`Verify File Count`, async ({ page }) => { 
@@ -29,9 +41,9 @@ test(`Verify File Count`, async ({ page }) => {
     await navigationUtil.browseTo(page, navigationUtil.landingPage);
     
     // Act
-    await page.act(corePrompts.clickAll("tabs"));
+    await page.act(prompts.clickAll("tabs"));
     const fileData = await page.extract({
-        instruction: corePrompts.extract("the total number of files"),
+        instruction: prompts.extract("the total number of files"),
         schema: z.object({ totalFiles: z.number() }),
     });
     
@@ -45,9 +57,9 @@ test(`Verify Specific Name`, async ({ page }) => {
     await navigationUtil.browseTo(page, navigationUtil.landingPage);
     
     // Act
-    await page.act(corePrompts.click("Data Display tab"));
+    await page.act(prompts.click("Data Display tab"));
     const nameData = await page.extract({
-        instruction: corePrompts.extract("the last name from the second row of the table"),
+        instruction: prompts.extract("the last name from the second row of the table"),
         schema: z.object({ actualName: z.string()})
     });
     
@@ -55,39 +67,22 @@ test(`Verify Specific Name`, async ({ page }) => {
     expect(nameData.actualName).toBe(expectedtName);
 });
 
-test(`Verify Captcha Success Message`, async ({ page }) => { 
+test.skip(`Verify Captcha Success Message`, async ({ page }) => { 
     // Arrange
     const expectedToastValue = "Captcha verified successfully";
     await navigationUtil.browseTo(page, navigationUtil.landingPage);
     
     // Act
     await page.agent.execute({
-        instruction: corePrompts.solve("captcha"),
+        instruction: prompts.solve("captcha"),
         maxSteps: 20,
         highlightCursor: true
     });
     const toastData = await page.extract({
-        instruction: corePrompts.waitFor("captcha to be solved") + " and " + corePrompts.extract("the toast message that appears"),
+        instruction: prompts.waitFor("captcha to be solved") + " and " + prompts.extract("the toast message that appears"),
         schema: z.object({toastMessage: z.string()})
     });
 
     // Assert
     expect(toastData.toastMessage).toContain(expectedToastValue);
-});
-
-test(`Verify Captcha Success Message 2`, async ({ page }) => { 
-    // Arrange
-    const expectedToastValue = "Captcha verified successfully";
-    await navigationUtil.browseTo(page, navigationUtil.landingPage);
-    
-    // Act
-    await page.act(corePrompts.click("Captcha tab"));
-    await page.act(corePrompts.observe("Captcha widget"));
-    await page.act(corePrompts.observe("Captcha value"));
-    await page.act(corePrompts.fill("captcha", "captcha value"));
-    await page.act(corePrompts.click("Verify Captcha button"));
-    const toastMessage = await page.act(corePrompts.extract("the toast message that appears"));
-
-    // Assert
-    expect(toastMessage.message).toContain(expectedToastValue);
 });

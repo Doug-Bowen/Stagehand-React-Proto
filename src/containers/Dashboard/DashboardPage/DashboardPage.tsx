@@ -292,28 +292,33 @@ const DashboardPage: FC = () => {
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <Card>
-                <CardHeader title="Input Controls" />
+                <CardHeader title="Input Controls Form" />
                 <CardContent>
                   <Stack spacing={3}>
                     <TextField
                       fullWidth
-                      label="Text Input"
+                      label="First Name"
                       value={textValue}
                       onChange={(e) => setTextValue(e.target.value)}
-                      helperText="Enter any text"
                     />
                     <TextField
                       fullWidth
-                      label="Email"
-                      type="email"
-                      placeholder="user@example.com"
+                      label="Last Name"
+                      placeholder="Enter your last name"
                     />
                     <TextField
                       fullWidth
-                      label="Multiline"
+                      label="Reference Number"
+                      type="number"
+                      inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                      helperText="Numbers only"
+                    />
+                    <TextField
+                      fullWidth
+                      label="Comments"
                       multiline
                       rows={3}
-                      defaultValue="This is a multiline input"
+                      placeholder="Enter your comments here"
                     />
                     <Autocomplete
                       options={autocompleteOptions}
