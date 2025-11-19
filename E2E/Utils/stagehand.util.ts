@@ -40,7 +40,15 @@ export const test = base.extend<{ page: any }>({
     enhancedPage.agent = stagehand.agent;
     
     await use(enhancedPage);
+    
+    // Show simple token count for this test
+    if (tokenTracker.length > 0) {
+      const totalTokens = tokenTracker.reduce((sum, t) => sum + t.totalTokens, 0);
+      console.log(`Tokens used: ${totalTokens}`);
+    }
+    
     await stagehand.close();
+    resetTokenTracking(); // Reset for next test
   },
 });
 
@@ -78,12 +86,94 @@ export class StagehandUtil {
     }
 }
 
-// Custom logger to filter out provider environment variable warnings
+// Token tracking storage
+interface TokenUsage {
+  operation: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  inferenceTimeMs: number;
+  timestamp: string;
+}
+
+const tokenTracker: TokenUsage[] = [];
+let testStartTime: Date | null = null;
+
+// Custom logger to filter out provider warnings and track token usage
 const quietLogger = (logLine: any) => {
+  // Filter out provider environment variable warnings
   if (logLine.message && logLine.message.includes("No known environment variable for provider")) {
     return; 
   }
+
+  // Track token usage from auxiliary data
+  if (logLine.auxiliary) {
+    const aux = logLine.auxiliary;
+    const promptTokens = aux.prompt_tokens?.value || aux.promptTokens?.value;
+    const completionTokens = aux.completion_tokens?.value || aux.completionTokens?.value;
+    const inferenceTime = aux.inference_time_ms?.value || aux.inferenceTimeMs?.value;
+
+    if (promptTokens && completionTokens) {
+      const totalTokens = parseInt(promptTokens) + parseInt(completionTokens);
+      tokenTracker.push({
+        operation: logLine.category || 'unknown',
+        promptTokens: parseInt(promptTokens),
+        completionTokens: parseInt(completionTokens),
+        totalTokens,
+        inferenceTimeMs: parseInt(inferenceTime || '0'),
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+
+  // Only log actual errors
   if (logLine.level === 0) {
     console.log(`[${logLine.category || 'LOG'}] ${logLine.message}`);
   }
 };
+
+// Export function to get token summary
+export const getTokenSummary = () => {
+  if (tokenTracker.length === 0) {
+    return "📊 No token usage tracked";
+  }
+
+  const totalPrompt = tokenTracker.reduce((sum, t) => sum + t.promptTokens, 0);
+  const totalCompletion = tokenTracker.reduce((sum, t) => sum + t.completionTokens, 0);
+  const totalTokens = totalPrompt + totalCompletion;
+  const totalTime = tokenTracker.reduce((sum, t) => sum + t.inferenceTimeMs, 0);
+
+  const operationSummary = tokenTracker.reduce((acc, t) => {
+    if (!acc[t.operation]) {
+      acc[t.operation] = { count: 0, tokens: 0, time: 0 };
+    }
+    acc[t.operation].count++;
+    acc[t.operation].tokens += t.totalTokens;
+    acc[t.operation].time += t.inferenceTimeMs;
+    return acc;
+  }, {} as Record<string, { count: number, tokens: number, time: number }>);
+
+  let summary = `\n📊 Token Usage Summary (${STAGEHAND_MODEL}):\n`;
+  summary += `   Total: ${totalTokens.toLocaleString()} tokens (${totalPrompt.toLocaleString()} prompt + ${totalCompletion.toLocaleString()} completion)\n`;
+  summary += `   Time: ${(totalTime / 1000).toFixed(2)}s across ${tokenTracker.length} operations\n`;
+  
+  if (Object.keys(operationSummary).length > 0) {
+    summary += `   By operation:\n`;
+    Object.entries(operationSummary).forEach(([op, data]) => {
+      summary += `     ${op}: ${data.tokens.toLocaleString()} tokens (${data.count} calls, ${(data.time / 1000).toFixed(1)}s)\n`;
+    });
+  }
+
+  return summary;
+};
+
+// Export function to reset token tracking
+export const resetTokenTracking = () => {
+  tokenTracker.length = 0;
+  testStartTime = new Date();
+};
+
+// Auto-reset at the start of each test run
+if (tokenTracker.length === 0) {
+  testStartTime = new Date();
+}
