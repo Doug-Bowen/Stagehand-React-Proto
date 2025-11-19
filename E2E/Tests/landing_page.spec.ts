@@ -18,7 +18,6 @@ test(`Fill the Input Controls Form`, async ({ page }) => {
         "Technologies": "Material-UI",
     };
     
-
     // Act
     await page.act(prompts.fillForm("Input Controls Form", formData));
     const actualFirstName = prompts.extract_text(page, "First Name");
