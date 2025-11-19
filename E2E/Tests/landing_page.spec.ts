@@ -8,8 +8,6 @@ const prompts = new Prompts();
 
 test(`Fill the Input Controls Form`, async ({ page }) => { 
     // Arrange
-    await navigationUtil.browseTo(page, navigationUtil.landingPage);
-    await page.observe(prompts.observe("Input Controls Form"));
     var formData = {
         "First Name": "Alice",
         "Last Name": "Johnson",
@@ -17,8 +15,10 @@ test(`Fill the Input Controls Form`, async ({ page }) => {
         "Comments": "This is a test comment\nSecond line\nThird line",
         "Technologies": "Material-UI",
     };
+    await navigationUtil.browseTo(page, navigationUtil.landingPage);
+    await page.observe(prompts.observe("Input Controls Form"));
     
-    // Act - Fill each field individually to ensure all fields are populated
+    // Act
     await page.act(prompts.fill("First Name field", formData["First Name"]));
     await page.act(prompts.fill("Last Name field", formData["Last Name"]));
     await page.act(prompts.fill("Reference Number field", formData["Reference Number"]));
