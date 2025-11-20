@@ -6,13 +6,41 @@ import { Prompts } from '../Utils/prompts';
 const navigationUtil = new NavigationUtil();
 const prompts = new Prompts();
 
-test('Verify Landing Page Loads', async ({ page }) => {
-    // Arrange & Act
+test(`Verify File Count - EXTRACT`, async ({ page }) => { 
+    // Arrange
+    const expectedTotalFiles = 86;
     await navigationUtil.browseTo(page, navigationUtil.landingPage);
-    await page.agent.execute('Fill out the Input Controls Form with sample data');
+    
+    // Act
+    await page.act(prompts.clickAll("tabs"));
+    const fileData = await page.extract(
+        prompts.extract("the total number of files"),
+        z.object({ totalFiles: z.number() })
+    );
+    
+    // Assert
+    expect(fileData.totalFiles).toBe(expectedTotalFiles);
 });
 
-test(`Fill the Input Controls Form`, async ({ page }) => { 
+
+test(`Verify Specific Name - EXTRACT`, async ({ page }) => { 
+    // Arrange
+    const expectedtName = "Smith";
+    await navigationUtil.browseTo(page, navigationUtil.landingPage);
+    
+    // Act
+    await page.act(prompts.click("Data Display tab"));
+    const nameData = await page.extract(
+        prompts.extract("the last name from the second row of the table"),
+        z.object({ actualName: z.string()})
+    );
+    
+    // Assert
+    expect(nameData.actualName).toBe(expectedtName);
+});
+
+
+test(`Verify Filling Input Controls Form - ACT`, async ({ page }) => { 
     // Arrange
     var formData = {
         "First Name": "Alice",
@@ -45,34 +73,24 @@ test(`Fill the Input Controls Form`, async ({ page }) => {
     expect((await actualTechnologies).actual).toBe(formData["Technologies"]);
 });
 
-test(`Verify File Count`, async ({ page }) => { 
-    // Arrange
-    const expectedTotalFiles = 86;
-    await navigationUtil.browseTo(page, navigationUtil.landingPage);
-    
-    // Act
-    await page.act(prompts.clickAll("tabs"));
-    const fileData = await page.extract(
-        prompts.extract("the total number of files"),
-        z.object({ totalFiles: z.number() })
-    );
-    
-    // Assert
-    expect(fileData.totalFiles).toBe(expectedTotalFiles);
-});
 
-test(`Verify Specific Name`, async ({ page }) => { 
+test('Verify Filling Input Controls Form - AGENT', async ({ page }) => {
     // Arrange
-    const expectedtName = "Smith";
     await navigationUtil.browseTo(page, navigationUtil.landingPage);
-    
+
     // Act
-    await page.act(prompts.click("Data Display tab"));
-    const nameData = await page.extract(
-        prompts.extract("the last name from the second row of the table"),
-        z.object({ actualName: z.string()})
-    );
-    
+    await page.agent.execute('Fill out the Input Controls Form with sample data');
+
+    const actualFirstName = prompts.extract_text(page, "First Name");
+    const actualLastName = prompts.extract_text(page, "Last Name");
+    const actualReferenceNumber = prompts.extract_text(page, "Reference Number");
+    const actualComments = prompts.extract_text(page, "Comments");
+    const actualTechnologies = prompts.extract_text(page, "Technologies");
+
     // Assert
-    expect(nameData.actualName).toBe(expectedtName);
+    expect((await actualFirstName).actual).not.toBe(null);
+    expect((await actualLastName).actual).not.toBe(null);
+    expect((await actualReferenceNumber).actual).not.toBe(null);
+    expect((await actualComments).actual).not.toBe(null);
+    expect((await actualTechnologies).actual).not.toBe(null);
 });
