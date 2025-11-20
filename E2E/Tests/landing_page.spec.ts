@@ -6,6 +6,12 @@ import { Prompts } from '../Utils/prompts';
 const navigationUtil = new NavigationUtil();
 const prompts = new Prompts();
 
+test('Verify Landing Page Loads', async ({ page }) => {
+    // Arrange & Act
+    await navigationUtil.browseTo(page, navigationUtil.landingPage);
+    await page.agent.execute('Fill out the Input Controls Form with sample data');
+});
+
 test(`Fill the Input Controls Form`, async ({ page }) => { 
     // Arrange
     var formData = {

@@ -1,8 +1,14 @@
 import { test as base } from '@playwright/test';
 import { Stagehand, type AvailableModel } from '@browserbasehq/stagehand';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables
+dotenv.config({ path: path.resolve(__dirname, '../../', '.env') });
+
 export { expect } from '@playwright/test';
 
-const STAGEHAND_MODEL: AvailableModel = "gpt-4o";  
+const STAGEHAND_MODEL: AvailableModel = "openai/gpt-4o";  
 const STAGEHAND_VERBOSE: 0 | 1 | 2 = 0; // 0=minimal, 1=medium, 2=detailed
 const STAGEHAND_ENV: "LOCAL" | "BROWSERBASE" = "LOCAL";
 
@@ -11,7 +17,7 @@ const STAGEHAND_ENV: "LOCAL" | "BROWSERBASE" = "LOCAL";
 // Notes: This custom implementation isn't exactly necessary, but it makes your tests read exactly like Playwright tests
 // Method: It creates a hybrid object that has all page methods plus agent.Normally Stagehand exposes page and agent via methods, but this way you can access them directly as properties of your page objects
 export const test = base.extend<{ page: any }>({
-  page: async ({ }, use, testInfo) => { 
+  page: async ({ }, use, testInfo) => {
     const stagehand = new Stagehand({
       env: STAGEHAND_ENV,
       model: STAGEHAND_MODEL,
@@ -37,7 +43,7 @@ export const test = base.extend<{ page: any }>({
       }
     };
     enhancedPage.observe = (instruction: string, options?: any) => stagehand.observe(instruction, { ...options, page });
-    enhancedPage.agent = stagehand.agent;
+    enhancedPage.agent = stagehand.agent();
     
     await use(enhancedPage);
     
@@ -72,7 +78,7 @@ export class StagehandUtil {
             
             // Set up page and agent using new 3.x API
             this.page = this.stagehand.context.pages()[0];
-            this.agent = this.stagehand.agent;
+            this.agent = this.stagehand.agent();
         }
         return this.stagehand!;
     }
