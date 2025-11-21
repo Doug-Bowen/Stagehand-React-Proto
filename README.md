@@ -1,166 +1,154 @@
-# React Controls Demo
+# Stagehand Demo
 
-A comprehensive Material-UI component showcase built with React and TypeScript, designed for automated testing and component exploration.
+A demonstration application showcasing **[Stagehand](https://github.com/browserbase/stagehand)** - an AI-powered browser automation framework. This repository provides a comprehensive testing playground with 60+ Material-UI components to demonstrate Stagehand's capabilities for intelligent test automation.
 
-## 🎯 Purpose
+## 🎯 What is This?
 
-This application serves as a **testing playground** and **component library showcase** featuring 60+ Material-UI components organized in an interactive dashboard. Perfect for:
+This demo application serves two purposes:
 
-- **Automated Testing**: Stagehand, Playwright, and other testing frameworks
-- **Component Exploration**: Interactive examples of MUI components
-- **Visual Regression Testing**: Comprehensive UI component coverage
-- **Accessibility Testing**: Properly labeled and structured components
-- **Development Reference**: Real-world component implementations
+1. **Showcase Stagehand**: Demonstrate how to use Stagehand's AI-powered browser automation with `act()`, `extract()`, `observe()`, and `agent` capabilities
+2. **Testing Playground**: Provide a rich UI with diverse components (forms, tables, dialogs, etc.) for practicing automated testing
 
-## 🚀 Tech Stack
+## 🤖 What is Stagehand?
 
-### Frontend Application
-- **React 18.2** - Modern React with concurrent features
-- **TypeScript 4.9** - Type-safe JavaScript
-- **MUI v5.18** (Material-UI) - Comprehensive React component library
-- **MUI Icons v5.18** - Material Design icon library
-- **Emotion 11.14** - CSS-in-JS styling solution for custom components
-- **React Router v5.2** - Client-side routing
+[Stagehand](https://github.com/browserbase/stagehand) is an AI-powered browser automation framework that uses natural language to interact with web applications. Instead of writing brittle selectors, you describe what you want to do in plain English:
 
-### Development & Testing
-- **React Scripts 5.0** - Modern build tooling with Webpack 5 and hot reloading
-- **Playwright 1.15** - Cross-browser end-to-end testing framework
-- **TypeScript** - Static type checking and enhanced IntelliSense
-- **ESLint** - Code quality and consistency enforcement
-- **Jest & React Testing Library** - Unit and integration testing
+```typescript
+// Traditional Playwright
+await page.locator('#firstName').fill('John');
 
-## 🎨 Featured Components
+// Stagehand - AI figures out which field to fill
+await page.act('Fill the First Name field with "John"');
+```
 
-The dashboard showcases components organized in 4 interactive tabs:
+### Key Stagehand Features Demonstrated
 
-### **Tab 1: Form Controls**
-- **Input Components**: TextField (text, email, multiline), Autocomplete
-- **Selection Controls**: Select, Radio Groups, Checkboxes, Switches  
-- **Interactive Elements**: Sliders, Ratings, Toggle Button Groups
-- **Button Variations**: Primary, Secondary, Success, Warning, Error
-- **Icon Buttons**: Edit, Delete, Share with tooltips
+- **`act()`** - Perform actions using natural language ("click the submit button")
+- **`extract()`** - Extract data from pages using AI ("get the user's name from the table")
+- **`observe()`** - Understand page state and context
+- **`agent`** - Autonomous multi-step task execution
 
-### **Tab 2: Data Display**
-- **Data Tables**: Complete tables with sorting, avatars, and actions
-- **Progress Indicators**: Linear & Circular progress, loading states
-- **Visual Elements**: Chips, Badges, Avatars in various styles
-- **Loading States**: Skeleton components for content loading
+## 🚀 Quick Start
 
-### **Tab 3: Navigation**
-- **Lists**: Interactive list items with icons and descriptions
-- **Steppers**: Multi-step workflow visualization
-- **Accordions**: Expandable content sections
-- **Breadcrumbs**: Hierarchical navigation
+### Prerequisites
+- Node.js 16+
+- OpenAI API key (for Stagehand AI features)
 
-### **Tab 4: Feedback**
-- **Alerts**: Success, Info, Warning, Error message types
-- **Dialogs**: Modal dialogs with form interactions
-- **Snackbars**: Toast-style notifications
+### Installation
 
-### **Additional Features**
-- **Floating Action Buttons**: Fixed position primary actions
-- **Speed Dial**: Multi-action floating menus
-- **Stats Cards**: Dashboard metrics with icons
-- **Interactive Forms**: Complete form workflows
+1. **Clone and install:**
+   ```bash
+   git clone https://github.com/Doug-Bowen/Stagehand-Demo.git
+   cd Stagehand-Demo
+   npm install
+   ```
+
+2. **Set up environment variables:**
+   Create a `.env` file in the root directory:
+   ```bash
+   OPENAI_API_KEY=your_openai_api_key_here
+   ```
+
+3. **Start the application:**
+   ```bash
+   npm start
+   ```
+   The app will open at [http://localhost:3000](http://localhost:3000)
+
+4. **Run Stagehand tests:**
+   ```bash
+   npx playwright test
+   ```
+
+## 📚 Example Tests
+
+The demo includes several Stagehand test examples in `E2E/Tests/landing_page.spec.ts`:
+
+### Using `extract()` to Get Data
+```typescript
+// Extract file count from the UI using AI
+const fileData = await page.extract(
+    "Look for the total number of files displayed",
+    z.object({ totalFiles: z.number() })
+);
+expect(fileData.totalFiles).toBe(86);
+```
+
+### Using `act()` for Interactions
+```typescript
+// Fill form fields using natural language
+await page.act('Fill the First Name field with "Alice"');
+await page.act('Fill the Last Name field with "Johnson"');
+await page.act('Fill the Comments field with "Test comment"');
+```
+
+### Using `agent` for Autonomous Tasks
+```typescript
+// Agent autonomously figures out how to complete the task
+await page.agent.execute('Fill out the Input Controls Form with sample data');
+```
+
+## 🎨 Application Features
+
+The demo app includes 4 tabs with diverse UI components:
+
+- **Form Controls**: Text fields, autocomplete, checkboxes, sliders, radio buttons, date pickers
+- **Data Display**: Tables with sorting/filtering, progress bars, chips, badges, avatars
+- **Navigation**: Lists, steppers, accordions, breadcrumbs
+- **Feedback**: Alerts, dialogs, snackbars, notifications
 
 ## 📁 Project Structure
 
 ```
-src/
-├── components/
-│   └── ErrorBoundary/      # Error handling component
-├── containers/
-│   └── Dashboard/          # Main MUI components showcase
-├── contexts/
-│   └── Authentication/     # Simplified auth context
-├── styles/                 # Global styles and themes
-├── App.tsx                 # Main application component
-├── Routes.tsx              # Application routing
-└── index.tsx               # Application entry point
-
-E2E/
-├── fixtures/               # Test data factories and mocks
-├── PageObjects/           # Page Object Model pattern
-├── Tests/                 # Playwright test suites
-└── Utils/                 # Testing utilities
+Stagehand-Demo/
+├── src/                      # React application
+│   ├── containers/
+│   │   └── Dashboard/        # Main UI components showcase
+│   ├── components/           # Reusable components
+│   └── contexts/             # React contexts
+│
+├── E2E/                      # Stagehand test suite
+│   ├── Tests/                # Test specifications
+│   │   └── landing_page.spec.ts  # Example Stagehand tests
+│   └── Utils/                # Test utilities
+│       ├── stagehand.util.ts     # Stagehand configuration
+│       ├── prompts.ts            # Reusable test prompts
+│       └── navigation.util.ts    # Navigation helpers
+│
+└── playwright.config.ts      # Playwright configuration
 ```
 
-## 🛠 Getting Started
+## 🔧 Tech Stack
 
-### Prerequisites
-- Node.js 16+ 
-- npm
+**Frontend:**
+- React 18.2 + TypeScript
+- Material-UI (MUI) v5.18
+- React Router
 
-### Installation & Development
+**Testing:**
+- **[@browserbasehq/stagehand](https://www.npmjs.com/package/@browserbasehq/stagehand)** - AI-powered automation
+- Playwright - Browser automation foundation
+- Zod - Schema validation for `extract()`
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+## 📖 Learning Resources
 
-2. **Start the development server:**
-   ```bash
-   npm start
-   ```
-   Opens [http://localhost:3000](http://localhost:3000) in your browser.
-
-3. **Build for production:**
-   ```bash
-   npm run build
-   ```
-
-### Testing
-
-**Run E2E tests:**
-```bash
-npx playwright test
-```
-
-**Run unit tests:**
-```bash
-npm test
-```
-
-## 🧪 Testing Features
-
-This demo is optimized for automated testing with:
-
-- **Semantic HTML**: Proper labels, ARIA attributes, and accessible markup
-- **Consistent Selectors**: Predictable element identification
-- **Interactive Elements**: All components support user interactions
-- **Loading States**: Dynamic content and async operations
-- **Form Validation**: Real form behaviors for testing
-- **Navigation Patterns**: Single-page app routing
-- **Responsive Design**: Mobile and desktop layouts
-
-## 🏗 Architecture
-
-### Component Design
-- **MUI v5** components with consistent theming
-- **TypeScript interfaces** for comprehensive prop validation
-- **React 18** patterns with proper children typing
-- **Emotion styled components** for custom styling
-- **Simplified routing** focused on component showcase
-
-## 📜 Available Scripts
-
-- `npm start` - Development server
-- `npm run build` - Production build
-- `npm test` - Run Jest unit tests
-- `npx playwright test` - Run E2E tests
-
-## 🌐 Browser Support
-
-- Chrome (latest)
-- Firefox (latest) 
-- Safari (latest)
-- Edge (latest)
+- **Stagehand Documentation**: [https://github.com/browserbase/stagehand](https://github.com/browserbase/stagehand)
+- **Stagehand NPM Package**: [@browserbasehq/stagehand](https://www.npmjs.com/package/@browserbasehq/stagehand)
+- **Test Examples**: See `E2E/Tests/landing_page.spec.ts` for practical examples
 
 ## 🎯 Use Cases
 
-- **Stagehand Testing**: Comprehensive component interactions
-- **Playwright Automation**: Cross-browser testing scenarios
-- **Visual Testing**: Screenshot and visual regression testing
-- **Accessibility Audits**: WCAG compliance testing
-- **Component Documentation**: Live examples of MUI components
-- **Development Reference**: Implementation patterns and best practices
+This demo is perfect for:
+
+- **Learning Stagehand**: Hands-on examples of AI-powered test automation
+- **Testing Workshops**: Ready-to-use application for teaching test automation
+- **Proof of Concepts**: Demonstrate Stagehand capabilities to stakeholders
+- **Test Development**: Practice writing Stagehand tests against a stable UI
+
+## 🤝 Contributing
+
+This is a demo repository. Feel free to fork and experiment with your own Stagehand test scenarios!
+
+## 📄 License
+
+This project is for demonstration purposes. See individual dependencies for their licenses.
